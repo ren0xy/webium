@@ -71,24 +71,24 @@ Bootstrap the Webium repository from a bare git repo into a fully structured UPM
   - [x] 1.8 Final checkpoint — all files created and verified
     - Ensure all 9 segment spec directories exist with `requirements.md` stubs. Verify naming convention matches `^[0-9]{3}-[a-z0-9-]+$`. Ask the user if questions arise.
 
-- [ ]* 2. Optional — Verification Tests / Stretch Goals
-  - [ ]* 2.1 Scaffold verification tests
-    - [ ]* 2.1.1 Property test: all `.cs` stub files in `Runtime/` and `Editor/` match the placeholder template (namespace + empty internal class)
+- [x] 2. Optional — Verification Tests / Stretch Goals
+  - [x] 2.1 Scaffold verification tests
+    - [x] 2.1.1 Property test: all `.cs` stub files in `Runtime/` and `Editor/` match the placeholder template (namespace + empty internal class)
       - **Property 1: Placeholder stub structure consistency**
       - **Validates: Requirements 6.3**
-    - [ ]* 2.1.2 Property test: all segment spec directories under `.kiro/specs/` (excluding `000-repo-init`) match the naming pattern `^[0-9]{3}-[a-z0-9-]+$`
+    - [x] 2.1.2 Property test: all segment spec directories under `.kiro/specs/` (excluding `000-repo-init`) match the naming pattern `^[0-9]{3}-[a-z0-9-]+$`
       - **Property 2: Spec directory naming convention**
       - **Validates: Requirements 8.2**
-    - [ ]* 2.1.3 Property test: all segment spec directories contain a `requirements.md` with segment scope summary and VISION.md reference
+    - [x] 2.1.3 Property test: all segment spec directories contain a `requirements.md` with segment scope summary and VISION.md reference
       - **Property 3: Spec stub completeness**
       - **Validates: Requirements 8.4**
-  - [ ]* 2.2 JSON validation tests
-    - [ ]* 2.2.1 Unit test: `package.json` is valid JSON with required UPM fields (name, version, displayName, unity)
+  - [x] 2.2 JSON validation tests
+    - [x] 2.2.1 Unit test: `package.json` is valid JSON with required UPM fields (name, version, displayName, unity)
       - _Requirements: 1.1, 1.2_
-    - [ ]* 2.2.2 Unit test: `webium.runtime.asmdef` and `webium.editor.asmdef` are valid JSON with correct assembly names and no circular references
+    - [x] 2.2.2 Unit test: `webium.runtime.asmdef` and `webium.editor.asmdef` are valid JSON with correct assembly names and no circular references
       - _Requirements: 3.1, 3.2, 3.3_
-  - [ ]* 2.3 Gitignore coverage tests
-    - [ ]* 2.3.1 Unit test: `.gitignore` contains patterns for OS files, IDE metadata, Unity generated files, and compiled artifacts with Plugins exception
+  - [x] 2.3 Gitignore coverage tests
+    - [x] 2.3.1 Unit test: `.gitignore` contains patterns for OS files, IDE metadata, Unity generated files, and compiled artifacts with Plugins exception
       - _Requirements: 4.1, 4.2, 4.3, 4.4, 4.5_
 
 ## Notes
