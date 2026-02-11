@@ -1,0 +1,23 @@
+{
+  "name": "@webium/core",
+  "version": "0.1.0",
+  "description": "Webium JS core — virtual DOM, CSS pipeline, layout, events, reconciliation, and render command generation",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest --run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "css-tree": "^3.1.0",
+    "yoga-layout": "^3.2.1"
+  },
+  "devDependencies": {
+    "@types/css-tree": "^2.3.11",
+    "fast-check": "^4.1.1",
+    "typescript": "^5.7.0",
+    "vitest": "^3.2.1"
+  }
+}

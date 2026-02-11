@@ -1,0 +1,21 @@
+{
+  "name": "webium.tests.unity.runtime",
+  "rootNamespace": "Webium.Tests.Unity.Runtime",
+  "references": [
+    "webium.unity.runtime",
+    "webium.core"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": true,
+  "precompiledReferences": [
+    "nunit.framework.dll",
+    "FsCheck.dll"
+  ],
+  "autoReferenced": false,
+  "defineConstraints": [
+    "UNITY_INCLUDE_TESTS"
+  ],
+  "noEngineReferences": false
+}

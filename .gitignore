@@ -1,0 +1,46 @@
+# OS generated
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+Desktop.ini
+
+# IDE / Editors
+.idea/
+.vs/
+.vscode/
+*.suo
+*.user
+*.userprefs
+*.pidb
+
+# Dotnet build output
+[Bb]in/
+[Oo]bj/
+*.nupkg
+*.snupkg
+
+# Unity (only relevant for webium-dev consumer project)
+[Ll]ibrary/
+[Tt]emp/
+[Ll]ogs/
+UserSettings/
+
+# Node
+node_modules/
+dist/
+*.tsbuildinfo
+
+# Package manager locks (keep package-lock.json, ignore others)
+yarn.lock
+pnpm-lock.yaml
+
+# Test coverage
+coverage/
+
+# Environment
+.env
+.env.local

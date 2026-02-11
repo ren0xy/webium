@@ -1,0 +1,20 @@
+{
+  "name": "webium.unity.editor",
+  "rootNamespace": "Webium.Editor",
+  "references": [
+    "webium.unity.runtime"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": true,
+  "precompiledReferences": [
+    "Webium.Core.dll",
+    "Webium.Layout.dll"
+  ],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "noEngineReferences": false
+}

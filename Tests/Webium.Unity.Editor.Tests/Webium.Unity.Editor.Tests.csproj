@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <RootNamespace>Webium.Tests.Editor</RootNamespace>
+    <LangVersion>latest</LangVersion>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.*" />
+    <PackageReference Include="NUnit" Version="3.*" />
+    <PackageReference Include="NUnit3TestAdapter" Version="4.*" />
+    <PackageReference Include="FsCheck" Version="2.*" />
+    <PackageReference Include="FsCheck.NUnit" Version="2.*" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Webium.Core\Webium.Core.csproj" />
+  </ItemGroup>
+  <!-- Include editor source files that have no Unity dependencies -->
+  <ItemGroup>
+    <Compile Include="..\..\src\Webium.Unity.Editor\MutationEntry.cs" Link="EditorSources\MutationEntry.cs" />
+    <Compile Include="..\..\src\Webium.Unity.Editor\MutationLogger.cs" Link="EditorSources\MutationLogger.cs" />
+    <Compile Include="..\..\src\Webium.Unity.Editor\SearchFilter.cs" Link="EditorSources\SearchFilter.cs" />
+    <Compile Include="..\..\src\Webium.Unity.Editor\DOMTreeFormatter.cs" Link="EditorSources\DOMTreeFormatter.cs" />
+    <Compile Include="..\..\src\Webium.Unity.Editor\NodeDetailFormatter.cs" Link="EditorSources\NodeDetailFormatter.cs" />
+  </ItemGroup>
+</Project>

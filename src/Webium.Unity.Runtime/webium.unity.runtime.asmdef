@@ -1,0 +1,18 @@
+{
+  "name": "webium.unity.runtime",
+  "rootNamespace": "Webium.Unity",
+  "references": [
+    "Unity.TextMeshPro"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": true,
+  "precompiledReferences": [
+    "Webium.Core.dll",
+    "Webium.Layout.dll"
+  ],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "noEngineReferences": false
+}
