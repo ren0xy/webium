@@ -1,0 +1,7 @@
+namespace Webium.Bridge
+{
+    /// <summary>
+    /// Placeholder — implementation provided by the dedicated segment spec.
+    /// </summary>
+    internal class PuertsBridge { }
+}

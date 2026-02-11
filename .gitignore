@@ -1,0 +1,62 @@
+# OS generated
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+Desktop.ini
+
+# IDE / Editors
+.idea/
+.vs/
+.vscode/
+*.csproj
+*.sln
+*.suo
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.svd
+*.pdb.meta
+*.mdb.meta
+
+# Unity generated
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+[Bb]uild/
+[Bb]uilds/
+[Ll]ogs/
+[Mm]emoryCaptures/
+[Rr]ecordings/
+Asset[Ss]tore[Tt]ools/
+UserSettings/
+
+# Unity meta files for special folders (not needed in UPM packages)
+# Keep .meta files — they are required for UPM packages
+
+# Compiled output
+*.dll
+*.pdb
+*.mdb
+!Plugins/**/*.dll
+!Plugins/**/*.pdb
+
+# Crash reports
+sysinfo.txt
+crashlytics-build.properties
+
+# Builds
+*.apk
+*.aab
+*.unitypackage
+*.app
+
+# Gradle (Android)
+.gradle/
+
+# Node (if using npm tools for JS shims)
+node_modules/

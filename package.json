@@ -1,0 +1,12 @@
+{
+  "name": "com.webium.core",
+  "version": "0.1.0",
+  "displayName": "Webium",
+  "description": "Browser-grade DOM/CSS/JS engine for Unity UI",
+  "unity": "2021.3",
+  "dependencies": {},
+  "author": {
+    "name": "Renato Rujevcic",
+    "url": "https://github.com/webium/webium"
+  }
+}
