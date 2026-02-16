@@ -1,11 +1,5 @@
 using System.Runtime.CompilerServices;
 
-[assembly: InternalsVisibleTo("Webium.API")]
-[assembly: InternalsVisibleTo("Webium.CSS")]
-[assembly: InternalsVisibleTo("Webium.JSRuntime")]
-[assembly: InternalsVisibleTo("Webium.Layout")]
-[assembly: InternalsVisibleTo("Webium.Modding")]
+[assembly: InternalsVisibleTo("webium.jsruntime")]
 [assembly: InternalsVisibleTo("Webium.Core.Tests")]
-[assembly: InternalsVisibleTo("Webium.API.Tests")]
-[assembly: InternalsVisibleTo("Webium.Modding.Tests")]
-[assembly: InternalsVisibleTo("Webium.Unity.Editor.Tests")]
+[assembly: InternalsVisibleTo("webium.tests.unity.editor")]

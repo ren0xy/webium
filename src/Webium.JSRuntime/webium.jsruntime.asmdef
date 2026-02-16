@@ -1,0 +1,16 @@
+{
+    "name": "webium.jsruntime",
+    "rootNamespace": "Webium.JSRuntime",
+    "references": [
+        "webium.core"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": true
+}

@@ -18,6 +18,8 @@ export { StyleInheritance, INHERITABLE_PROPERTIES, INITIAL_VALUES } from "./css/
 export { ComputedStyleResolver } from "./css/computed-style-resolver.js";
 export type { IStyleSheetManager } from "./css/stylesheet-manager.js";
 export { StyleSheetManager } from "./css/stylesheet-manager.js";
+export type { FileProvider } from "./css/css-loader.js";
+export { CSSLoader } from "./css/css-loader.js";
 
 // Events
 export type { DOMEvent, EventCallback, EventPhase, EventListenerEntry, IVirtualNode } from "./events/types.js";
@@ -37,6 +39,7 @@ export type { RenderCommand, IRenderCommandBuffer } from "./bridge/render-comman
 export { deserializeTypedArray, deserializeJSON } from "./bridge/render-command-deserializer.js";
 export type { InputEvent } from "./bridge/input-event.js";
 export { InputEventHandler } from "./bridge/input-event.js";
+export { createHandleInputEvent } from "./bridge/handle-input-event.js";
 
 // Reconciliation
 export type { IReconciliationEngine } from "./reconciliation/reconciliation-engine.js";
@@ -49,3 +52,14 @@ export type { ICSSScoper } from "./modding/css-scoper.js";
 export { CSSScoper } from "./modding/css-scoper.js";
 export type { IModManager } from "./modding/mod-manager.js";
 export { ModManager } from "./modding/mod-manager.js";
+
+// Parser
+export type { ParseResult } from "./parser/html-parser.js";
+export { parseHTML } from "./parser/html-parser.js";
+
+// API
+export { DocumentAPI, ElementAPI, ScriptExecutor, createDocumentAPI } from "./api/index.js";
+export type { RuntimeEvaluator } from "./api/index.js";
+
+// Bootstrap (side-effect module — sets up globalThis.tick, handleInputEvent, initialize)
+import "./bootstrap.js";

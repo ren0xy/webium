@@ -44,6 +44,14 @@ namespace Webium.JSRuntime
         }
 
         /// <inheritdoc />
+        public T CallFunction<T>(string name, params object[] args)
+        {
+            ThrowIfDisposed();
+            // TODO: invoke via PuerTS function call API with typed return
+            return default;
+        }
+
+        /// <inheritdoc />
         public void RegisterBinding(string name, Delegate callback)
         {
             ThrowIfDisposed();

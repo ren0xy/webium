@@ -39,6 +39,23 @@ const TAG_NAMES: ReadonlyMap<string, NodeTag> = new Map([
   ["img", NodeTag.Img],
   ["text", NodeTag.Text],
   ["style", NodeTag.Style],
+  ["button", NodeTag.Button],
+  ["input", NodeTag.Input],
+  ["a", NodeTag.A],
+  ["ul", NodeTag.Ul],
+  ["ol", NodeTag.Ol],
+  ["li", NodeTag.Li],
+  ["h1", NodeTag.H1],
+  ["h2", NodeTag.H2],
+  ["h3", NodeTag.H3],
+  ["h4", NodeTag.H4],
+  ["h5", NodeTag.H5],
+  ["h6", NodeTag.H6],
+  ["script", NodeTag.Script],
+  ["link", NodeTag.Link],
+  ["body", NodeTag.Body],
+  ["head", NodeTag.Head],
+  ["html", NodeTag.Html],
 ]);
 
 export class SelectorMatcher implements ISelectorMatcher {

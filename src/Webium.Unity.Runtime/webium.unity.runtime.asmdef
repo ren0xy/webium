@@ -1,18 +1,19 @@
 {
-  "name": "webium.unity.runtime",
-  "rootNamespace": "Webium.Unity",
-  "references": [
-    "Unity.TextMeshPro"
-  ],
-  "includePlatforms": [],
-  "excludePlatforms": [],
-  "allowUnsafeCode": false,
-  "overrideReferences": true,
-  "precompiledReferences": [
-    "Webium.Core.dll",
-    "Webium.Layout.dll"
-  ],
-  "autoReferenced": true,
-  "defineConstraints": [],
-  "noEngineReferences": false
+    "name": "webium.unity.runtime",
+    "rootNamespace": "Webium.Unity",
+    "references": [
+        "webium.core",
+        "webium.jsruntime",
+        "Unity.TextMeshPro",
+        "com.tencent.puerts.core"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
 }

@@ -5,21 +5,20 @@ using Webium.Core;
 namespace Webium.Editor
 {
     /// <summary>
-    /// Takes snapshots of the VirtualDOM tree and diffs consecutive frames
+    /// Takes snapshots of the NodeSnapshot tree and diffs consecutive frames
     /// to produce MutationEntry records for the MutationLogger.
     /// </summary>
     public class DOMSnapshotDiffer
     {
-        private Dictionary<int, NodeSnapshot> _previous = new Dictionary<int, NodeSnapshot>();
+        private Dictionary<int, SnapEntry> _previous = new Dictionary<int, SnapEntry>();
 
-        private struct NodeSnapshot
+        private struct SnapEntry
         {
             public int Id;
             public NodeTag Tag;
             public int? ParentId;
             public List<int> ChildIds;
             public Dictionary<string, string> Attributes;
-            public Dictionary<string, string> InlineStyles;
             public string TextContent;
         }
 
@@ -27,13 +26,13 @@ namespace Webium.Editor
         /// Snapshots the current DOM tree and returns a list of mutations
         /// detected since the last call.
         /// </summary>
-        public List<MutationEntry> DiffAndUpdate(VirtualNode root, int frameNumber, float timestamp)
+        public List<MutationEntry> DiffAndUpdate(NodeSnapshot root, int frameNumber, float timestamp)
         {
             var mutations = new List<MutationEntry>();
-            var current = new Dictionary<int, NodeSnapshot>();
+            var current = new Dictionary<int, SnapEntry>();
 
             if (root != null)
-                CollectSnapshot(root, current);
+                CollectSnapshot(root, null, current);
 
             DetectNewNodes(current, mutations, frameNumber, timestamp);
             DetectRemovedNodes(current, mutations, frameNumber, timestamp);
@@ -49,26 +48,25 @@ namespace Webium.Editor
             _previous.Clear();
         }
 
-        private void CollectSnapshot(VirtualNode node, Dictionary<int, NodeSnapshot> map)
+        private void CollectSnapshot(NodeSnapshot node, int? parentId, Dictionary<int, SnapEntry> map)
         {
-            var snap = new NodeSnapshot
+            var snap = new SnapEntry
             {
                 Id = node.Id,
                 Tag = node.Tag,
-                ParentId = node.Parent?.Id,
+                ParentId = parentId,
                 ChildIds = node.Children.Select(c => c.Id).ToList(),
                 Attributes = new Dictionary<string, string>(node.Attributes),
-                InlineStyles = new Dictionary<string, string>(node.InlineStyles),
                 TextContent = node.TextContent
             };
             map[node.Id] = snap;
 
             foreach (var child in node.Children)
-                CollectSnapshot(child, map);
+                CollectSnapshot(child, node.Id, map);
         }
 
         private void DetectNewNodes(
-            Dictionary<int, NodeSnapshot> current,
+            Dictionary<int, SnapEntry> current,
             List<MutationEntry> mutations,
             int frameNumber, float timestamp)
         {
@@ -94,7 +92,6 @@ namespace Webium.Editor
                         : null
                 });
 
-                // Also log the AppendChild if it has a parent
                 if (snap.ParentId.HasValue)
                 {
                     mutations.Add(new MutationEntry
@@ -111,7 +108,7 @@ namespace Webium.Editor
         }
 
         private void DetectRemovedNodes(
-            Dictionary<int, NodeSnapshot> current,
+            Dictionary<int, SnapEntry> current,
             List<MutationEntry> mutations,
             int frameNumber, float timestamp)
         {
@@ -137,7 +134,7 @@ namespace Webium.Editor
         }
 
         private void DetectChanges(
-            Dictionary<int, NodeSnapshot> current,
+            Dictionary<int, SnapEntry> current,
             List<MutationEntry> mutations,
             int frameNumber, float timestamp)
         {
@@ -148,7 +145,7 @@ namespace Webium.Editor
 
                 var curr = kvp.Value;
 
-                // Detect reparenting (InsertBefore / AppendChild)
+                // Detect reparenting
                 if (curr.ParentId != prev.ParentId)
                 {
                     if (prev.ParentId.HasValue)
@@ -178,9 +175,8 @@ namespace Webium.Editor
                 }
                 else if (curr.ParentId.HasValue && prev.ParentId.HasValue)
                 {
-                    // Detect reordering within the same parent (InsertBefore)
-                    var currParent = current.ContainsKey(curr.ParentId.Value) ? current[curr.ParentId.Value] : (NodeSnapshot?)null;
-                    var prevParent = _previous.ContainsKey(prev.ParentId.Value) ? _previous[prev.ParentId.Value] : (NodeSnapshot?)null;
+                    var currParent = current.ContainsKey(curr.ParentId.Value) ? current[curr.ParentId.Value] : (SnapEntry?)null;
+                    var prevParent = _previous.ContainsKey(prev.ParentId.Value) ? _previous[prev.ParentId.Value] : (SnapEntry?)null;
 
                     if (currParent.HasValue && prevParent.HasValue)
                     {
@@ -204,10 +200,6 @@ namespace Webium.Editor
                 // Detect attribute changes
                 DetectDictChanges(prev.Attributes, curr.Attributes, curr.Id, curr.Tag,
                     MutationEntryType.SetAttribute, mutations, frameNumber, timestamp);
-
-                // Detect inline style changes
-                DetectDictChanges(prev.InlineStyles, curr.InlineStyles, curr.Id, curr.Tag,
-                    MutationEntryType.StyleChange, mutations, frameNumber, timestamp);
             }
         }
 
@@ -221,7 +213,6 @@ namespace Webium.Editor
         {
             string tagStr = tag.ToString();
 
-            // Added or changed keys
             foreach (var kvp in curr)
             {
                 string prevVal;
@@ -239,7 +230,6 @@ namespace Webium.Editor
                 }
             }
 
-            // Removed keys
             foreach (var kvp in prev)
             {
                 if (!curr.ContainsKey(kvp.Key))

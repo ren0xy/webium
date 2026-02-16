@@ -20,6 +20,12 @@ namespace Webium.JSRuntime
         [DllImport("__Internal")]
         private static extern void WebiumBridge_Flush();
 
+        [DllImport("__Internal")]
+        private static extern IntPtr WebiumBridge_CallTick(out int length);
+
+        [DllImport("__Internal")]
+        private static extern void WebiumBridge_ForwardInputEvent(string serializedEvent);
+
         /// <inheritdoc />
         public void OnMutation(Action<MutationBatch> handler)
         {
@@ -42,14 +48,19 @@ namespace Webium.JSRuntime
         /// <inheritdoc />
         public byte[] CallTick()
         {
-            // TODO: Call JS-side tick() via jslib and return the serialized RenderCommandBuffer
-            return Array.Empty<byte>();
+            var ptr = WebiumBridge_CallTick(out int length);
+            if (ptr == IntPtr.Zero || length == 0)
+                return Array.Empty<byte>();
+
+            var buffer = new byte[length];
+            Marshal.Copy(ptr, buffer, 0, length);
+            return buffer;
         }
 
         /// <inheritdoc />
         public void ForwardInputEvent(string serializedEvent)
         {
-            // TODO: Forward serialized InputEvent to JS-side InputEventHandler via jslib
+            WebiumBridge_ForwardInputEvent(serializedEvent);
         }
 
         /// <summary>

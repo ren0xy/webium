@@ -8,7 +8,7 @@ namespace Webium.Unity
     /// Unity implementation of <see cref="ILogger"/>.
     /// Delegates to <c>Debug.LogWarning</c> and <c>Debug.LogException</c>.
     /// </summary>
-    public class UnityLogger : ILogger
+    public class UnityLogger : Webium.Core.ILogger
     {
         public void LogWarning(string message) => Debug.LogWarning(message);
 

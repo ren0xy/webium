@@ -801,3 +801,61 @@ describe("Property 9: Selector matching correctness", () => {
     );
   });
 });
+
+// Feature: expanded-node-tags, Property 2: TAG_NAMES ↔ NodeTag selector matching consistency
+describe("Property 2: TAG_NAMES ↔ NodeTag selector matching consistency", () => {
+  const matcher = new SelectorMatcher();
+
+  /**
+   * All element NodeTag values mapped to their lowercase CSS type selector.
+   * Excludes Text and Unknown since they don't represent HTML elements.
+   */
+  const ELEMENT_TAG_ENTRIES: Array<[NodeTag, string]> = [
+    [NodeTag.Div, "div"],
+    [NodeTag.Span, "span"],
+    [NodeTag.P, "p"],
+    [NodeTag.Img, "img"],
+    [NodeTag.Style, "style"],
+    [NodeTag.Button, "button"],
+    [NodeTag.Input, "input"],
+    [NodeTag.A, "a"],
+    [NodeTag.Ul, "ul"],
+    [NodeTag.Ol, "ol"],
+    [NodeTag.Li, "li"],
+    [NodeTag.H1, "h1"],
+    [NodeTag.H2, "h2"],
+    [NodeTag.H3, "h3"],
+    [NodeTag.H4, "h4"],
+    [NodeTag.H5, "h5"],
+    [NodeTag.H6, "h6"],
+    [NodeTag.Script, "script"],
+    [NodeTag.Link, "link"],
+    [NodeTag.Body, "body"],
+    [NodeTag.Head, "head"],
+    [NodeTag.Html, "html"],
+  ];
+
+  /**
+   * Validates: Requirements 2.1, 2.2
+   *
+   * For any NodeTag value that represents an HTML element (excluding Text and Unknown),
+   * creating a VirtualNode with that tag and matching it against the corresponding
+   * lowercase CSS type selector via matchesSimpleSelector returns true.
+   */
+  it("matchesSimpleSelector returns true for every element NodeTag with its corresponding tag name", () => {
+    fc.assert(
+      fc.property(
+        fc.constantFrom(...ELEMENT_TAG_ENTRIES),
+        ([nodeTag, tagName]) => {
+          const node = new VirtualNode();
+          node.tag = nodeTag;
+          node.id = 1;
+
+          expect(matcher.matchesSimpleSelector(node, tagName)).toBe(true);
+        },
+      ),
+      { numRuns: 100 },
+    );
+  });
+});
+

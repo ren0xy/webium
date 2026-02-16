@@ -6,8 +6,9 @@ using Webium.Unity;
 namespace Webium.Editor
 {
     /// <summary>
-    /// Custom EditorWindow that visualises the live VirtualDOM tree, node properties,
-    /// computed styles, and mutation log during Play Mode.
+    /// Custom EditorWindow that visualises the live DOM snapshot tree, node properties,
+    /// and mutation log during Play Mode.
+    /// TODO: Wire a snapshot provider once IJSBridge exposes GetSnapshot().
     /// </summary>
     public class WebiumInspector : EditorWindow
     {
@@ -17,13 +18,13 @@ namespace Webium.Editor
             GetWindow<WebiumInspector>("Webium Inspector");
         }
 
-        private VirtualDOM _dom;
+        private NodeSnapshot _rootSnapshot;
         private DOMTreeDrawer _treeDrawer;
         private NodeDetailDrawer _detailDrawer;
         private MutationLogDrawer _mutationLogDrawer;
         private MutationLogger _mutationLogger;
         private SearchFilter _searchFilter;
-        private VirtualNode _selectedNode;
+        private NodeSnapshot _selectedNode;
         private DOMSnapshotDiffer _snapshotDiffer;
 
         private bool _showMutationLog;
@@ -40,15 +41,13 @@ namespace Webium.Editor
             _snapshotDiffer = new DOMSnapshotDiffer();
 
             EditorApplication.playModeStateChanged += OnPlayModeChanged;
-
-            if (EditorApplication.isPlaying)
-                AcquireDOM();
         }
 
         private void OnDisable()
         {
             EditorApplication.playModeStateChanged -= OnPlayModeChanged;
-            ReleaseDOM();
+            _rootSnapshot = null;
+            _selectedNode = null;
         }
 
         private void OnPlayModeChanged(PlayModeStateChange state)
@@ -56,50 +55,38 @@ namespace Webium.Editor
             switch (state)
             {
                 case PlayModeStateChange.EnteredPlayMode:
-                    AcquireDOM();
+                    _snapshotDiffer.Reset();
                     break;
                 case PlayModeStateChange.ExitingPlayMode:
-                    ReleaseDOM();
+                    _rootSnapshot = null;
+                    _selectedNode = null;
+                    _snapshotDiffer.Reset();
                     break;
             }
-        }
-
-        private void AcquireDOM()
-        {
-            var loop = FindObjectOfType<ReconciliationLoopBehaviour>();
-            _dom = loop != null ? loop.DOM : null;
-            _snapshotDiffer.Reset();
-        }
-
-        private void ReleaseDOM()
-        {
-            _dom = null;
-            _selectedNode = null;
-            _snapshotDiffer.Reset();
         }
 
         private void Update()
         {
-            if (EditorApplication.isPlaying && _dom != null)
-            {
-                var mutations = _snapshotDiffer.DiffAndUpdate(
-                    _dom.Root,
-                    Time.frameCount,
-                    Time.realtimeSinceStartup);
+            if (!EditorApplication.isPlaying || _rootSnapshot == null)
+                return;
 
-                foreach (var entry in mutations)
-                    _mutationLogger.Log(entry);
+            var mutations = _snapshotDiffer.DiffAndUpdate(
+                _rootSnapshot,
+                Time.frameCount,
+                Time.realtimeSinceStartup);
 
-                Repaint();
-            }
+            foreach (var entry in mutations)
+                _mutationLogger.Log(entry);
+
+            Repaint();
         }
 
         private void OnGUI()
         {
-            if (_dom == null)
+            if (!EditorApplication.isPlaying || _rootSnapshot == null)
             {
                 EditorGUILayout.HelpBox(
-                    "No active Webium DOM found. Enter Play Mode with a Webium surface.",
+                    "No active Webium DOM snapshot found. Enter Play Mode with a Webium surface.",
                     MessageType.Info);
                 return;
             }
@@ -140,16 +127,14 @@ namespace Webium.Editor
         {
             EditorGUILayout.BeginHorizontal();
 
-            // Tree panel
             EditorGUILayout.BeginVertical(GUILayout.Width(_treeWidth));
             _treeScroll = EditorGUILayout.BeginScrollView(_treeScroll);
-            var selected = _treeDrawer.Draw(_dom.Root, _searchFilter);
+            var selected = _treeDrawer.Draw(_rootSnapshot, _searchFilter);
             if (selected != null)
                 _selectedNode = selected;
             EditorGUILayout.EndScrollView();
             EditorGUILayout.EndVertical();
 
-            // Detail panel
             EditorGUILayout.BeginVertical();
             _detailDrawer.Draw(_selectedNode);
             EditorGUILayout.EndVertical();

@@ -26,7 +26,7 @@ export class ReconciliationEngine implements IReconciliationEngine {
   private readonly _dom: VirtualDOM;
   private readonly _styleResolver: IComputedStyleResolver;
   private readonly _styleSheetManager: IStyleSheetManager;
-  private readonly _layoutEngine: ILayoutEngine | null;
+  private _layoutEngine: ILayoutEngine | null;
   private readonly _logger: ILogger | null;
   private readonly _buffer = new RenderCommandBuffer();
 
@@ -51,6 +51,11 @@ export class ReconciliationEngine implements IReconciliationEngine {
     this._styleSheetManager = styleSheetManager;
     this._layoutEngine = layoutEngine ?? null;
     this._logger = logger ?? null;
+  }
+
+  /** Late-bind a layout engine (e.g. after async yoga WASM init). */
+  setLayoutEngine(engine: ILayoutEngine): void {
+    this._layoutEngine = engine;
   }
 
   /** Mark a node as newly created (will emit Create command on next tick). */
@@ -121,6 +126,17 @@ export class ReconciliationEngine implements IReconciliationEngine {
         parentId,
         siblingIndex,
       });
+
+      // Newly created nodes with text content need an UpdateText command
+      // even if DirtyFlags.Text isn't set (createTextNode doesn't set it)
+      if (node.textContent != null && node.textContent !== "") {
+        this._buffer.push({
+          op: RenderOp.UpdateText,
+          nodeId: node.id,
+          text: node.textContent,
+        });
+        this._prevText.set(node.id, node.textContent);
+      }
     }
 
     // Tree changes (reparent)

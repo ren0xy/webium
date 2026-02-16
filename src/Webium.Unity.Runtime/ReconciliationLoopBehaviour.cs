@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using Webium.Core;
 using Webium.JSRuntime;
@@ -5,51 +6,30 @@ using Webium.JSRuntime;
 namespace Webium.Unity
 {
     /// <summary>
-    /// Thin Unity MonoBehaviour wrapper that implements ILifecycleDriver.
-    /// Calls JS-side tick() via the bridge in LateUpdate, receives the
-    /// RenderCommandBuffer, and feeds it to the UnityRenderCommandExecutor.
+    /// MonoBehaviour that drives the JS→C# render loop each frame.
+    /// Calls <see cref="IJSBridge.CallTick"/> and feeds the resulting
+    /// command buffer to <see cref="IRenderCommandExecutor.Execute"/>.
     /// </summary>
-    public class ReconciliationLoopBehaviour : MonoBehaviour, ILifecycleDriver
+    public class ReconciliationLoopBehaviour : MonoBehaviour
     {
         private IJSBridge _bridge;
         private IRenderCommandExecutor _executor;
 
-        [System.Obsolete("Use Initialize(IJSBridge, IRenderCommandExecutor) instead.")]
-        private ReconciliationEngine _legacyEngine;
-
-        /// <summary>
-        /// Initializes with the new architecture: bridge + command executor.
-        /// </summary>
         public void Initialize(IJSBridge bridge, IRenderCommandExecutor executor)
         {
             _bridge = bridge;
             _executor = executor;
         }
 
-        /// <summary>
-        /// Legacy initializer for backward compatibility during migration.
-        /// </summary>
-        [System.Obsolete("Use Initialize(IJSBridge, IRenderCommandExecutor) instead.")]
-        public void Initialize(ReconciliationEngine engine)
+        private void Update()
         {
-            _legacyEngine = engine;
-        }
+            if (_bridge == null || _executor == null) return;
 
-        public void Tick()
-        {
-            if (_bridge != null && _executor != null)
+            var buffer = _bridge.CallTick();
+            if (buffer != null && buffer.Length > 0)
             {
-                var buffer = _bridge.CallTick();
-                if (buffer != null && buffer.Length > 0)
-                {
-                    _executor.Execute(buffer);
-                }
+                _executor.Execute(buffer);
             }
-        }
-
-        private void LateUpdate()
-        {
-            Tick();
         }
     }
 }

@@ -42,6 +42,15 @@ namespace Webium.JSRuntime
         }
 
         /// <inheritdoc />
+        public T CallFunction<T>(string name, params object[] args)
+        {
+            ThrowIfDisposed();
+            var argsJson = SerializeArgs(args);
+            var result = WebiumJS_CallFunction(name, argsJson);
+            return (T)(object)result;
+        }
+
+        /// <inheritdoc />
         public void RegisterBinding(string name, Delegate callback)
         {
             ThrowIfDisposed();

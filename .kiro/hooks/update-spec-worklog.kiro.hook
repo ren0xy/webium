@@ -1,0 +1,13 @@
+{
+  "enabled": true,
+  "name": "Update Spec Worklog",
+  "description": "After write operations, reminds the agent to update the worklog in the current spec folder with what was done, any roadblocks encountered, and how they were resolved.",
+  "version": "1",
+  "when": {
+    "type": "agentStop"
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "If you were working on spec tasks during this session, check if the spec's worklog.md needs updating. Append concise entries for any completed tasks and any roadblocks encountered/resolved. Follow the format in the worklog-and-knowledge steering file. If no spec work was done, do nothing."
+  }
+}

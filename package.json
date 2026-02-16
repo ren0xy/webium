@@ -1,0 +1,21 @@
+{
+  "name": "com.webium.core",
+  "version": "0.0.1",
+  "displayName": "Webium",
+  "description": "HTML/CSS/JS UI framework for Unity, powered by PuerTS",
+  "unity": "6000.0",
+  "documentationUrl": "https://github.com/ren0xy/webium#readme",
+  "license": "MIT",
+  "dependencies": {
+    "com.tencent.puerts.core": "2.1.0",
+    "com.unity.textmeshpro": "3.0.6",
+    "com.unity.ugui": "2.0.0"
+  },
+  "samples": [
+    {
+      "displayName": "Hello World",
+      "description": "Basic HTML/CSS/JS UI rendered in Unity",
+      "path": "examples/hello-world"
+    }
+  ]
+}

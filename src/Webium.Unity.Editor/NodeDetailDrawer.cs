@@ -8,7 +8,7 @@ namespace Webium.Editor
     {
         private Vector2 _scrollPosition;
 
-        public void Draw(VirtualNode node)
+        public void Draw(NodeSnapshot node)
         {
             if (node == null)
             {
@@ -20,33 +20,24 @@ namespace Webium.Editor
 
             DrawIdentity(node);
             DrawAttributes(node);
-            DrawInlineStyles(node);
-            DrawComputedStyles(node);
             DrawRenderHandle(node);
 
             EditorGUILayout.EndScrollView();
         }
 
-        private void DrawIdentity(VirtualNode node)
+        private void DrawIdentity(NodeSnapshot node)
         {
             EditorGUILayout.LabelField("Identity", EditorStyles.boldLabel);
             EditorGUI.indentLevel++;
             EditorGUILayout.LabelField("Id", node.Id.ToString());
             EditorGUILayout.LabelField("Tag", node.Tag.ToString());
-
-            if (node.Parent != null)
-                EditorGUILayout.LabelField("Parent", $"<{node.Parent.Tag}> #{node.Parent.Id}");
-            else
-                EditorGUILayout.LabelField("Parent", "none");
-
             EditorGUILayout.LabelField("Children", node.Children.Count.ToString());
             EditorGUILayout.LabelField("TextContent", node.TextContent ?? "(null)");
-            EditorGUILayout.LabelField("DirtyFlags", node.Dirty.ToString());
             EditorGUI.indentLevel--;
             EditorGUILayout.Space();
         }
 
-        private void DrawAttributes(VirtualNode node)
+        private void DrawAttributes(NodeSnapshot node)
         {
             EditorGUILayout.LabelField("Attributes", EditorStyles.boldLabel);
             EditorGUI.indentLevel++;
@@ -63,41 +54,7 @@ namespace Webium.Editor
             EditorGUILayout.Space();
         }
 
-        private void DrawInlineStyles(VirtualNode node)
-        {
-            EditorGUILayout.LabelField("Inline Styles", EditorStyles.boldLabel);
-            EditorGUI.indentLevel++;
-            if (node.InlineStyles.Count == 0)
-            {
-                EditorGUILayout.LabelField("(none)");
-            }
-            else
-            {
-                foreach (var kvp in node.InlineStyles)
-                    EditorGUILayout.LabelField(kvp.Key, kvp.Value);
-            }
-            EditorGUI.indentLevel--;
-            EditorGUILayout.Space();
-        }
-
-        private void DrawComputedStyles(VirtualNode node)
-        {
-            EditorGUILayout.LabelField("Computed Styles", EditorStyles.boldLabel);
-            EditorGUI.indentLevel++;
-            if (node.ComputedStyle == null)
-            {
-                EditorGUILayout.LabelField("No computed styles available");
-            }
-            else
-            {
-                foreach (var kvp in node.ComputedStyle)
-                    EditorGUILayout.LabelField(kvp.Key, kvp.Value);
-            }
-            EditorGUI.indentLevel--;
-            EditorGUILayout.Space();
-        }
-
-        private void DrawRenderHandle(VirtualNode node)
+        private void DrawRenderHandle(NodeSnapshot node)
         {
             EditorGUILayout.LabelField("Render Handle", EditorStyles.boldLabel);
             EditorGUI.indentLevel++;
@@ -124,7 +81,7 @@ namespace Webium.Editor
         /// The Unity-specific GameObject branch is handled here; all other types
         /// fall through to the pure formatter.
         /// </summary>
-        public static string FormatRenderHandle(VirtualNode node)
+        public static string FormatRenderHandle(NodeSnapshot node)
         {
             if (node == null || node.RenderHandle == null)
                 return NodeDetailFormatter.FormatRenderHandle(node);

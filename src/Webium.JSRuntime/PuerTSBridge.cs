@@ -11,9 +11,15 @@ namespace Webium.JSRuntime
     /// </summary>
     public class PuerTSBridge : IJSBridge
     {
+        private readonly IJSRuntime _runtime;
         private Action<MutationBatch> _mutationHandler;
         private readonly List<(string messageType, object payload)> _outboundQueue
             = new List<(string, object)>();
+
+        public PuerTSBridge(IJSRuntime runtime)
+        {
+            _runtime = runtime;
+        }
 
         /// <inheritdoc />
         public void OnMutation(Action<MutationBatch> handler)
@@ -42,14 +48,15 @@ namespace Webium.JSRuntime
         /// <inheritdoc />
         public byte[] CallTick()
         {
-            // TODO: Call JS-side tick() via PuerTS and return the serialized RenderCommandBuffer
-            return Array.Empty<byte>();
+            // Use typed CallFunction<byte[]> so PuerTS marshals Uint8Array → byte[] directly
+            var result = _runtime.CallFunction<byte[]>("tick");
+            return result ?? Array.Empty<byte>();
         }
 
         /// <inheritdoc />
         public void ForwardInputEvent(string serializedEvent)
         {
-            // TODO: Forward serialized InputEvent to JS-side InputEventHandler via PuerTS
+            _runtime.CallFunction("handleInputEvent", serializedEvent);
         }
 
         /// <summary>

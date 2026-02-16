@@ -16,6 +16,63 @@ namespace Webium.Tests.JSRuntime
     [TestFixture]
     public class PuerTSBridgeTests
     {
+        private class StubJSRuntime : IJSRuntime
+        {
+            public bool IsReady => true;
+            public object Evaluate(string script) => null;
+            public object CallFunction(string name, params object[] args) => null;
+            public T CallFunction<T>(string name, params object[] args) => default;
+            public void RegisterBinding(string name, Delegate callback) { }
+            public void Dispose() { }
+        }
+
+        /// <summary>
+        /// Configurable IJSRuntime stub that returns a preset value from CallFunction.
+        /// Used by Property 3 (CallTick delegation) for spec 007.
+        /// </summary>
+        private class ConfigurableJSRuntime : IJSRuntime
+        {
+            public object CallFunctionReturnValue { get; set; }
+            public string LastCalledFunctionName { get; private set; }
+            public bool IsReady => true;
+            public object Evaluate(string script) => null;
+            public object CallFunction(string name, params object[] args)
+            {
+                LastCalledFunctionName = name;
+                return CallFunctionReturnValue;
+            }
+            public T CallFunction<T>(string name, params object[] args)
+            {
+                LastCalledFunctionName = name;
+                if (CallFunctionReturnValue is T typed) return typed;
+                return default;
+            }
+            public void RegisterBinding(string name, Delegate callback) { }
+            public void Dispose() { }
+        }
+
+        /// <summary>
+        /// Recording IJSRuntime that captures CallFunction invocations for verification.
+        /// Used by Property 2 (ForwardInputEvent delegation).
+        /// </summary>
+        private class RecordingJSRuntime : IJSRuntime
+        {
+            public List<(string name, object[] args)> Calls = new List<(string, object[])>();
+            public bool IsReady => true;
+            public object Evaluate(string script) => null;
+            public object CallFunction(string name, params object[] args)
+            {
+                Calls.Add((name, args));
+                return null;
+            }
+            public T CallFunction<T>(string name, params object[] args)
+            {
+                Calls.Add((name, args));
+                return default;
+            }
+            public void RegisterBinding(string name, Delegate callback) { }
+            public void Dispose() { }
+        }
         /// <summary>
         /// Custom Arbitrary for Mutation structs covering all five MutationOp values.
         /// Reuses the same generation strategy as MutationBatchTests.
@@ -52,7 +109,7 @@ namespace Webium.Tests.JSRuntime
         [FsCheck.NUnit.Property(MaxTest = 100, Arbitrary = new[] { typeof(PuerTSBridgeTests) })]
         public FsCheck.Property ReceiveMutations_InvokesHandler_WithSameBatch(Mutation[] mutations)
         {
-            var bridge = new PuerTSBridge();
+            var bridge = new PuerTSBridge(new StubJSRuntime());
             var batch = new MutationBatch();
             foreach (var m in mutations)
             {
@@ -98,7 +155,7 @@ namespace Webium.Tests.JSRuntime
         [FsCheck.NUnit.Property(MaxTest = 100, Arbitrary = new[] { typeof(PuerTSBridgeTests) })]
         public FsCheck.Property Flush_ClearsQueue_AndSecondFlushIsNoOp(NonNull<string>[] messageTypes)
         {
-            var bridge = new PuerTSBridge();
+            var bridge = new PuerTSBridge(new StubJSRuntime());
 
             // Post all messages to the bridge with generated message types
             foreach (var msgType in messageTypes)
@@ -123,6 +180,66 @@ namespace Webium.Tests.JSRuntime
             return (queuedCorrectly && clearedAfterFlush && secondFlushIsNoOp)
                 .ToProperty()
                 .Label("Feature: js-runtime-service, Property 4: Bridge flush clears queue");
+        }
+
+        /// <summary>
+        /// Property 2: PuerTSBridge.ForwardInputEvent delegates to IJSRuntime.CallFunction
+        /// For any string s, calling PuerTSBridge.ForwardInputEvent(s) should invoke
+        /// IJSRuntime.CallFunction("handleInputEvent", s) exactly once with the exact same string argument.
+        /// **Validates: Requirements 2.1**
+        /// </summary>
+        [FsCheck.NUnit.Property(MaxTest = 100)]
+        public FsCheck.Property ForwardInputEvent_DelegatesToCallFunction(NonNull<string> serializedEvent)
+        {
+            var runtime = new RecordingJSRuntime();
+            var bridge = new PuerTSBridge(runtime);
+
+            bridge.ForwardInputEvent(serializedEvent.Get);
+
+            return (runtime.Calls.Count == 1
+                && runtime.Calls[0].name == "handleInputEvent"
+                && runtime.Calls[0].args.Length == 1
+                && (string)runtime.Calls[0].args[0] == serializedEvent.Get)
+                .ToProperty()
+                .Label("Feature: event-round-trip, Property 2: PuerTSBridge.ForwardInputEvent delegation");
+        }
+
+        /// <summary>
+        /// Property 3: CallTick delegates to runtime and returns result
+        /// For any byte[] value returned by IJSRuntime.CallFunction("tick"),
+        /// PuerTSBridge.CallTick() should return that same byte[].
+        /// **Validates: Requirements 3.1, 3.2, 3.3**
+        /// </summary>
+        [FsCheck.NUnit.Property(MaxTest = 100)]
+        public FsCheck.Property CallTick_ReturnsSameByteArray_AsRuntime(byte[] expected)
+        {
+            var runtime = new ConfigurableJSRuntime { CallFunctionReturnValue = expected };
+            var bridge = new PuerTSBridge(runtime);
+
+            var result = bridge.CallTick();
+
+            var calledTick = runtime.LastCalledFunctionName == "tick";
+            var arraysEqual = result.SequenceEqual(expected);
+
+            return (calledTick && arraysEqual)
+                .ToProperty()
+                .Label("Feature: 007-hello-world-integration, Property 3: CallTick delegates to runtime and returns result");
+        }
+
+        /// <summary>
+        /// Property 3 (null case): When the runtime returns null, CallTick() returns an empty array.
+        /// **Validates: Requirements 3.1, 3.2, 3.3**
+        /// </summary>
+        [Test]
+        public void CallTick_ReturnsEmptyArray_WhenRuntimeReturnsNull()
+        {
+            var runtime = new ConfigurableJSRuntime { CallFunctionReturnValue = null };
+            var bridge = new PuerTSBridge(runtime);
+
+            var result = bridge.CallTick();
+
+            Assert.That(runtime.LastCalledFunctionName, Is.EqualTo("tick"));
+            Assert.That(result, Is.Empty);
         }
     }
 }

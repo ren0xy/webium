@@ -14,6 +14,9 @@ import type { ModManifest } from "../../src/modding/manifest-parser.js";
 
 export const arbNodeTag = fc.constantFrom(
   NodeTag.Div, NodeTag.Span, NodeTag.P, NodeTag.Img, NodeTag.Text, NodeTag.Style,
+  NodeTag.Unknown, NodeTag.Button, NodeTag.Input, NodeTag.A, NodeTag.Ul, NodeTag.Ol,
+  NodeTag.Li, NodeTag.H1, NodeTag.H2, NodeTag.H3, NodeTag.H4, NodeTag.H5, NodeTag.H6,
+  NodeTag.Script, NodeTag.Link, NodeTag.Body, NodeTag.Head, NodeTag.Html,
 );
 
 export const arbSpecificity: fc.Arbitrary<Specificity> = fc.record({
@@ -100,4 +103,174 @@ export function arbVirtualDOMTree(childCount: number): { dom: VirtualDOM; nodes:
     nodes.push(node);
   }
   return { dom, nodes };
+}
+
+// ---------------------------------------------------------------------------
+// HTML Parser generators (Task 4.1)
+// ---------------------------------------------------------------------------
+import { HTML_TAG_MAP } from "../../src/parser/html-parser.js";
+
+/**
+ * Random known HTML tag name string (lowercase) from HTML_TAG_MAP.
+ * Validates: Requirements 2.3
+ */
+export const arbHtmlTagName: fc.Arbitrary<string> = fc.constantFrom(
+  ...Array.from(HTML_TAG_MAP.keys()),
+);
+
+/**
+ * Random attribute key-value tuples (excluding `style`).
+ * Keys drawn from common HTML attributes plus random data-* names.
+ * Values are safe alphanumeric strings (no `"`, `<`, `>`, `&`).
+ * Validates: Requirements 2.6
+ */
+export const arbHtmlAttributes: fc.Arbitrary<[string, string][]> = fc
+  .array(
+    fc.tuple(
+      fc.oneof(
+        fc.constantFrom("id", "class", "src", "href", "type"),
+        fc.stringMatching(/^data-[a-z]{1,6}$/),
+      ),
+      fc.stringMatching(/^[a-zA-Z0-9 ]{0,20}$/),
+    ),
+    { maxLength: 5 },
+  )
+  .map((pairs) => {
+    // Deduplicate by key, keeping first occurrence; exclude `style`
+    const seen = new Set<string>();
+    const result: [string, string][] = [];
+    for (const [k, v] of pairs) {
+      if (k !== "style" && !seen.has(k)) {
+        seen.add(k);
+        result.push([k, v]);
+      }
+    }
+    return result;
+  });
+
+/**
+ * Random CSS property-value pairs for inline styles.
+ * Uses known CSS property names and safe values.
+ * Returns unique property-value tuples.
+ * Validates: Requirements 2.7
+ */
+export const arbInlineStylePairs: fc.Arbitrary<[string, string][]> = fc
+  .array(
+    fc.tuple(
+      fc.constantFrom(
+        "color", "display", "margin", "padding", "font-size",
+        "background-color", "width", "height", "opacity", "position",
+        "border", "text-align", "line-height", "font-weight",
+      ),
+      fc.constantFrom(
+        "red", "blue", "green", "0", "10px", "auto", "flex",
+        "block", "none", "1", "center", "bold", "20px", "inherit",
+      ),
+    ),
+    { minLength: 1, maxLength: 5 },
+  )
+  .map((pairs) => {
+    // Deduplicate by property name, keeping first occurrence
+    const seen = new Set<string>();
+    const result: [string, string][] = [];
+    for (const [prop, val] of pairs) {
+      if (!seen.has(prop)) {
+        seen.add(prop);
+        result.push([prop, val]);
+      }
+    }
+    return result;
+  });
+
+/**
+ * Random well-formed HTML string built from known tags with configurable
+ * depth/breadth. Uses only `div` and `span` for nesting (other tags have
+ * implicit closing behavior in htmlparser2 that complicates round-tripping).
+ * Validates: Requirements 2.3
+ */
+export const arbSimpleHtml: fc.Arbitrary<string> = fc
+  .tuple(
+    fc.integer({ min: 1, max: 3 }), // depth
+    fc.integer({ min: 1, max: 3 }), // breadth per level
+    fc.array(fc.constantFrom("div", "span"), { minLength: 1, maxLength: 12 }),
+  )
+  .map(([depth, breadth, tags]) => {
+    let tagIdx = 0;
+    function build(d: number): string {
+      if (d <= 0 || tagIdx >= tags.length) return "";
+      let html = "";
+      const count = Math.min(breadth, tags.length - tagIdx);
+      for (let i = 0; i < count && tagIdx < tags.length; i++) {
+        const tag = tags[tagIdx++];
+        const inner = d > 1 ? build(d - 1) : "text";
+        html += `<${tag}>${inner}</${tag}>`;
+      }
+      return html;
+    }
+    return build(depth);
+  })
+  .filter((s) => s.length > 0);
+
+// ---------------------------------------------------------------------------
+// Browser API Surface generators (Task 8.1)
+// ---------------------------------------------------------------------------
+
+/**
+ * Random camelCase CSS property name (1-4 segments).
+ * E.g. "backgroundColor", "fontSize", "color"
+ * Supports testing for: 5.1, 6.1, 10.1
+ */
+export const arbCamelCaseProp: fc.Arbitrary<string> = fc
+  .array(fc.stringMatching(/^[a-z]{1,6}$/), { minLength: 1, maxLength: 4 })
+  .filter((segs) => segs.every((s) => s.length > 0))
+  .map((segs) =>
+    segs
+      .map((s, i) => (i === 0 ? s : s[0].toUpperCase() + s.slice(1)))
+      .join(""),
+  );
+
+/**
+ * Random kebab-case CSS property name (1-4 segments joined by hyphens).
+ * E.g. "background-color", "font-size", "color"
+ * Supports testing for: 5.1, 6.1, 10.1
+ */
+export const arbKebabCaseProp: fc.Arbitrary<string> = fc
+  .array(fc.stringMatching(/^[a-z]{1,6}$/), { minLength: 1, maxLength: 4 })
+  .filter((segs) => segs.every((s) => s.length > 0))
+  .map((segs) => segs.join("-"));
+
+/**
+ * Random HTML attribute name (lowercase letters, 1-10 chars, excluding "style").
+ * E.g. "class", "id", "data"
+ * Supports testing for: 5.1, 6.1, 10.1
+ */
+export const arbAttributeName: fc.Arbitrary<string> = fc
+  .stringMatching(/^[a-z]{1,10}$/)
+  .filter((s) => s.length > 0 && s !== "style");
+
+/**
+ * Random script VirtualNode (inline with textContent or external with src attribute).
+ * Requires a VirtualDOM instance to create nodes.
+ * Supports testing for: 5.1, 6.1, 10.1
+ */
+export function arbScriptNode(
+  dom: VirtualDOM,
+): fc.Arbitrary<VirtualNode> {
+  const arbInlineScript = fc
+    .stringMatching(/^[a-zA-Z0-9 =;().]{1,40}$/)
+    .map((code) => {
+      const node = dom.createElement(NodeTag.Script);
+      node.textContent = code;
+      return node;
+    });
+
+  const arbExternalScript = fc
+    .stringMatching(/^[a-z]{1,10}\.js$/)
+    .map((src) => {
+      const node = dom.createElement(NodeTag.Script);
+      node.attributes.set("src", src);
+      return node;
+    });
+
+  return fc.oneof(arbInlineScript, arbExternalScript);
 }

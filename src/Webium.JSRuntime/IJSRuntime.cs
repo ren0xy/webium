@@ -38,6 +38,12 @@ namespace Webium.JSRuntime
         object CallFunction(string name, params object[] args);
 
         /// <summary>
+        /// Calls a named JS function and marshals the result to <typeparamref name="T"/>.
+        /// Use when the return type is known (e.g. <c>byte[]</c> for typed arrays).
+        /// </summary>
+        T CallFunction<T>(string name, params object[] args);
+
+        /// <summary>
         /// Registers a C# delegate as a JS-callable binding.
         /// </summary>
         /// <param name="name">The name exposed to JS.</param>

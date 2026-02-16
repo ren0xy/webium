@@ -14,20 +14,19 @@ namespace Webium.Editor
         /// Draws the DOM tree starting from root, filtered by the given SearchFilter.
         /// Returns the currently selected node, or null if none.
         /// </summary>
-        public VirtualNode Draw(VirtualNode root, SearchFilter filter)
+        public NodeSnapshot Draw(NodeSnapshot root, SearchFilter filter)
         {
             if (root == null) return null;
 
-            VirtualNode selected = null;
+            NodeSnapshot selected = null;
             DrawNode(root, 0, filter, ref selected);
             return selected;
         }
 
-        private void DrawNode(VirtualNode node, int depth, SearchFilter filter, ref VirtualNode selected)
+        private void DrawNode(NodeSnapshot node, int depth, SearchFilter filter, ref NodeSnapshot selected)
         {
             if (node == null) return;
 
-            // When filter is active, skip nodes that don't match and have no matching descendants
             if (filter != null && filter.IsActive && !filter.MatchesOrHasMatchingDescendant(node))
                 return;
 
@@ -36,12 +35,6 @@ namespace Webium.Editor
             bool isSelected = node.Id == _selectedNodeId;
 
             string label = FormatNodeLabel(node);
-
-            // Dirty flag visual indicator
-            bool isDirty = node.Dirty != DirtyFlags.None;
-            Color prevColor = GUI.contentColor;
-            if (isDirty)
-                GUI.contentColor = new Color(1f, 0.6f, 0.2f); // orange tint for dirty nodes
 
             EditorGUILayout.BeginHorizontal();
             GUILayout.Space(depth * 16f);
@@ -58,7 +51,7 @@ namespace Webium.Editor
             }
             else
             {
-                GUILayout.Space(14f); // indent to align with foldout arrow
+                GUILayout.Space(14f);
             }
 
             GUIStyle style = isSelected ? EditorStyles.boldLabel : EditorStyles.label;
@@ -69,13 +62,9 @@ namespace Webium.Editor
 
             EditorGUILayout.EndHorizontal();
 
-            if (isDirty)
-                GUI.contentColor = prevColor;
-
             if (isSelected)
                 selected = node;
 
-            // Draw children if expanded
             if (hasChildren && isExpanded)
             {
                 foreach (var child in node.Children)
@@ -89,6 +78,6 @@ namespace Webium.Editor
         /// Formats a node label for display in the tree.
         /// Delegates to <see cref="DOMTreeFormatter.FormatNodeLabel"/> for testability.
         /// </summary>
-        public static string FormatNodeLabel(VirtualNode node) => DOMTreeFormatter.FormatNodeLabel(node);
+        public static string FormatNodeLabel(NodeSnapshot node) => DOMTreeFormatter.FormatNodeLabel(node);
     }
 }

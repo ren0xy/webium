@@ -20,10 +20,20 @@ namespace Webium.Tests.Editor.Generators
         public static readonly string[] StyleValues = { "red", "blue", "16px", "block", "none", "auto", "0", "100%" };
 
         public static Gen<NodeTag> ElementTagGen() =>
-            Gen.Elements(NodeTag.Div, NodeTag.Span, NodeTag.P, NodeTag.Img);
+            Gen.Elements(
+                NodeTag.Div, NodeTag.Span, NodeTag.P, NodeTag.Img, NodeTag.Style,
+                NodeTag.Button, NodeTag.Input, NodeTag.A,
+                NodeTag.Ul, NodeTag.Ol, NodeTag.Li,
+                NodeTag.H1, NodeTag.H2, NodeTag.H3, NodeTag.H4, NodeTag.H5, NodeTag.H6,
+                NodeTag.Script, NodeTag.Link, NodeTag.Body, NodeTag.Head, NodeTag.Html);
 
         public static Gen<NodeTag> AnyTagGen() =>
-            Gen.Elements(NodeTag.Div, NodeTag.Span, NodeTag.P, NodeTag.Img, NodeTag.Text);
+            Gen.Elements(
+                NodeTag.Div, NodeTag.Span, NodeTag.P, NodeTag.Img, NodeTag.Text, NodeTag.Style, NodeTag.Unknown,
+                NodeTag.Button, NodeTag.Input, NodeTag.A,
+                NodeTag.Ul, NodeTag.Ol, NodeTag.Li,
+                NodeTag.H1, NodeTag.H2, NodeTag.H3, NodeTag.H4, NodeTag.H5, NodeTag.H6,
+                NodeTag.Script, NodeTag.Link, NodeTag.Body, NodeTag.Head, NodeTag.Html);
 
         public static Gen<Dictionary<string, string>> AttributesGen() =>
             Gen.Choose(0, 3).SelectMany(count =>

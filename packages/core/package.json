@@ -7,15 +7,19 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc",
+    "build:bundle": "node esbuild.config.mjs",
+    "build:bundle:copy": "node esbuild.config.mjs && node -e \"require('fs').cpSync('../../build/webium-bootstrap.js','../../Resources/webium-bootstrap.txt')\"",
     "test": "vitest --run",
     "test:watch": "vitest"
   },
   "dependencies": {
     "css-tree": "^3.1.0",
+    "htmlparser2": "^10.1.0",
     "yoga-layout": "^3.2.1"
   },
   "devDependencies": {
     "@types/css-tree": "^2.3.11",
+    "esbuild": "^0.27.3",
     "fast-check": "^4.1.1",
     "typescript": "^5.7.0",
     "vitest": "^3.2.1"
