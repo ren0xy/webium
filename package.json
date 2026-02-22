@@ -1,6 +1,6 @@
 {
   "name": "com.webium.core",
-  "version": "0.0.1",
+  "version": "0.2.0",
   "displayName": "Webium",
   "description": "HTML/CSS/JS UI framework for Unity, powered by PuerTS",
   "unity": "6000.0",
@@ -15,7 +15,7 @@
     {
       "displayName": "Hello World",
       "description": "Basic HTML/CSS/JS UI rendered in Unity",
-      "path": "examples/hello-world"
+      "path": "examples~/hello-world"
     }
   ]
 }

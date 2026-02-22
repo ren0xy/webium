@@ -1,0 +1,80 @@
+body {
+  background-color: #1a1a2e;
+  font-family: sans-serif;
+  padding: 20px;
+  color: #ffffff;
+}
+
+.container {
+  background-color: #16213e;
+  padding: 20px;
+}
+
+h1 { font-size: 32px; color: #e94560; }
+h2 { font-size: 28px; color: #e94560; }
+h3 { font-size: 24px; color: #e94560; }
+h4 { font-size: 20px; color: #e94560; }
+h5 { font-size: 18px; color: #e94560; }
+h6 { font-size: 16px; color: #e94560; }
+
+.colored {
+  color: #0f3460;
+}
+
+.sized {
+  font-size: 24px;
+}
+
+.bold {
+  font-weight: bold;
+}
+
+.italic {
+  font-style: italic;
+}
+
+.bold-italic {
+  font-weight: bold;
+  font-style: italic;
+}
+
+.bg-box {
+  background-color: #533483;
+  padding: 10px;
+}
+
+.opacity-50 {
+  opacity: 0.5;
+}
+
+.hidden-vis {
+  visibility: hidden;
+}
+
+.hidden-display {
+  display: none;
+}
+
+.padded {
+  padding: 20px;
+}
+
+.nested .inner span {
+  color: #e94560;
+  font-size: 14px;
+}
+
+button {
+  background-color: #e94560;
+  color: #ffffff;
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.img-placeholder {
+  background-color: #533483;
+  padding: 40px;
+  color: #ffffff;
+  font-size: 14px;
+}

@@ -1,0 +1,45 @@
+body {
+  background-color: #1a1a2e;
+  font-family: sans-serif;
+  padding: 20px;
+  color: #ffffff;
+}
+
+button {
+  background-color: #e94560;
+  color: #ffffff;
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+#counter-section {
+  margin-bottom: 20px;
+}
+
+#input-section {
+  margin-bottom: 20px;
+}
+
+#text-input {
+  padding: 8px 12px;
+  font-size: 16px;
+  background-color: #16213e;
+  color: #ffffff;
+  border: 1px solid #e94560;
+}
+
+#echo {
+  margin-top: 10px;
+  color: #ffffff;
+}
+
+#list-section button {
+  margin-right: 10px;
+}
+
+#item-list {
+  margin-top: 10px;
+  padding-left: 20px;
+  color: #ffffff;
+}

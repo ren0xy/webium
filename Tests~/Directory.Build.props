@@ -1,0 +1,13 @@
+<Project>
+  <!--
+    Unity ignores folders ending with '~'. Redirect bin/obj to bin~/obj~
+    so dotnet build output stays local but Unity never scans it.
+    Without this, duplicate assemblies cause CS0433 errors.
+    Must be in Directory.Build.props (before Microsoft.Common.props import).
+  -->
+  <PropertyGroup>
+    <BaseOutputPath>bin~</BaseOutputPath>
+    <BaseIntermediateOutputPath>obj~</BaseIntermediateOutputPath>
+    <MSBuildProjectExtensionsPath>$(BaseIntermediateOutputPath)</MSBuildProjectExtensionsPath>
+  </PropertyGroup>
+</Project>
